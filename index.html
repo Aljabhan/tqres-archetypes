@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tqres Archetype Wheel</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400..800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400..800&display=swap">
+<style>
+:root{
+  /* layout: one persistent wheel on the left, a story panel on the right, five stages */
+  --ink:#0D1A20; --panel:#14262E; --line:#27404A; --text:#EDE6D6; --muted:#9DB0B3; --gold:#F0B94A;
+  --display:'Bricolage Grotesque','Trebuchet MS',sans-serif;
+  --body:'IBM Plex Sans Arabic',Tahoma,sans-serif;
+  --kufi:'Noto Kufi Arabic',Tahoma,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.5;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+header{display:flex;align-items:center;gap:20px;padding:14px 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{font-family:var(--kufi);font-weight:800;font-size:22px;color:var(--gold);display:flex;gap:10px;align-items:baseline}
+.brand span{font-family:var(--display);font-size:14px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-inline-start:auto}
+nav button{background:none;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;color:var(--muted);display:flex;gap:8px;align-items:center}
+nav button b{font-family:var(--display);font-weight:700}
+nav button i{font-style:normal;font-family:var(--kufi);font-size:13px}
+nav button[aria-current="true"]{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:24px;padding:20px 24px}
+.stagebox{display:flex;align-items:center;justify-content:center;min-height:0}
+.wheel{position:relative;width:min(100%,calc(100vh - 170px));aspect-ratio:1}
+.wheel svg{width:100%;height:100%;display:block;overflow:visible}
+.seg{transition:opacity .5s,transform .5s cubic-bezier(.3,1.4,.5,1)}
+.seg path{stroke:transparent;stroke-width:3;transition:stroke .3s}
+.seg text{fill:#0D1A20;text-anchor:middle;pointer-events:none}
+.seg .en{font-family:var(--display);font-weight:800;font-size:11.5px;letter-spacing:.09em}
+.seg .ar{font-family:var(--kufi);font-weight:700;font-size:13px}
+.seg.dim{opacity:.16}
+.seg.half{opacity:.5}
+.seg.sel{transform:translate(var(--dx),var(--dy))}
+.seg.sel path{stroke:var(--text)}
+.s0 .seg,.s1 .seg{cursor:pointer}
+.dot{fill:var(--text);opacity:0;transition:opacity .4s}
+.s2 .dot{opacity:1}
+#mk{opacity:0;transition:transform 1s cubic-bezier(.5,0,.2,1),opacity .5s}
+.s3 #mk,.s4 #mk{opacity:1}
+#mk text{font-family:var(--kufi);font-weight:800;font-size:15px;fill:var(--gold);text-anchor:middle}
+#mk .ring{fill:none;stroke:var(--gold);stroke-width:2;animation:pulse 1.8s ease-out infinite;transform-origin:center;transform-box:fill-box}
+@keyframes pulse{from{transform:scale(.5);opacity:1}to{transform:scale(1.6);opacity:0}}
+#hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:30%;aspect-ratio:1;border-radius:50%;background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px;gap:2px}
+#hub small{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+#hub b{font-family:var(--display);font-size:clamp(13px,1.5vw,19px);line-height:1.15}
+#hub i{font-style:normal;font-family:var(--kufi);font-weight:700;font-size:clamp(13px,1.5vw,19px);color:var(--gold)}
+#hub .word{font-family:var(--kufi);font-weight:800;font-size:clamp(22px,3vw,40px);color:var(--gold);line-height:1.2}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:28px 32px;display:flex;flex-direction:column;min-height:0}
+#story{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px;animation:in .45s ease-out}
+@keyframes in{from{opacity:.2;transform:translateY(10px)}}
+.eyebrow{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,3.4vw,46px);line-height:1.05;margin:0;text-wrap:balance}
+.arh{font-family:var(--kufi);font-weight:800;font-size:clamp(24px,2.8vw,38px);line-height:1.3;margin:0;direction:rtl;text-align:right;color:var(--gold)}
+p{margin:0;max-width:62ch}
+.rtl{direction:rtl;text-align:right;font-family:var(--kufi)}
+.muted{color:var(--muted)}
+.chip{display:inline-flex;gap:10px;align-items:center;border-radius:999px;padding:5px 16px;font-weight:600;color:var(--ink);align-self:flex-start}
+.chip i{font-style:normal;font-family:var(--kufi)}
+.say{border-inline-start:4px solid var(--gold);padding:10px 16px;background:rgba(240,185,74,.08);border-radius:0 12px 12px 0}
+.say .rtl{font-size:21px;font-weight:700}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.box{border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.box.hot{border-color:var(--gold)}
+.box h3{margin:0;font-family:var(--display);font-size:16px}
+ul{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:6px}
+.grp{display:grid;grid-template-columns:140px 1fr;gap:6px 14px;align-items:baseline}
+.grp b{font-family:var(--display)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{border:1px solid var(--line);border-radius:999px;padding:2px 12px;font-size:15px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts button{background:none;border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.opts button b{font-family:var(--display)}
+.opts button i{font-style:normal;font-family:var(--kufi);color:var(--muted)}
+.opts button:hover:not(:disabled){border-color:var(--gold)}
+.opts .ok{background:#2E6B4F;border-color:#7FD1A6}
+.opts .no{background:#6B2E2E;border-color:#E39A9A}
+.exs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ex{background:none;border:1px solid var(--line);border-radius:12px;padding:8px 12px;text-align:start;display:flex;flex-direction:column;gap:2px}
+.ex.on{border-color:var(--gold);background:rgba(240,185,74,.1)}
+.ex b{font-family:var(--display);font-size:17px}
+.ex span{font-size:14px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ex span::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.ex em{font-style:normal;font-size:14px;color:var(--muted)}
+.foot{display:flex;gap:12px;align-items:center;padding-top:16px;border-top:1px solid var(--line);margin-top:16px}
+.foot button{border:1px solid var(--line);background:none;border-radius:999px;padding:8px 20px;font-family:var(--display);font-weight:700}
+.foot .go{background:var(--gold);border-color:var(--gold);color:var(--ink);margin-inline-start:auto}
+.foot button:disabled{opacity:.35;cursor:default}
+@media (max-width:860px){
+  html,body{height:auto}
+  main{grid-template-columns:1fr;padding:16px}
+  .wheel{width:min(100%,520px)}
+  .pair,.opts,.exs{grid-template-columns:1fr}
+  .grp{grid-template-columns:1fr}
+  nav button i{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">تكريس <span>Archetype workshop</span></div>
+  <a href="archetypes/" style="color:var(--gold);font-size:14px">Read the 12 pages · اقرأ الصفحات</a>
+  <nav id="nav" aria-label="Stages"></nav>
+</header>
+<main>
+  <div class="stagebox">
+    <div class="wheel" id="wheel">
+      <svg id="svg" viewBox="-345 -345 690 690" role="img" aria-label="Wheel of the 12 brand archetypes"></svg>
+      <div id="hub"></div>
+    </div>
+  </div>
+  <section class="panel">
+    <div id="story"></div>
+    <div class="foot">
+      <button id="prev">← Back</button>
+      <button id="play" hidden>Pause tour</button>
+      <button id="next" class="go">Next →</button>
+    </div>
+  </section>
+</main>
+<script>
+const A=[
+{en:'Innocent',ar:'البريء',d:'Safety',da:'الأمان',t:'Keeps things simple, honest and optimistic. Promises that everything will be fine.',ta:'يبسّط الأمور ويعد بالصدق والطمأنينة.',s:'بيتك جاهز… وبدون مفاجآت',g:'Your home is ready, with no surprises.',re:'Nobody in our market set leads here.'},
+{en:'Sage',ar:'الحكيم',d:'Knowledge',da:'المعرفة',t:'Helps people understand through facts, data and expertise.',ta:'يساعد الناس على الفهم بالأرقام والخبرة.',s:'قبل لا تشتري، افهم السوق بالأرقام',g:'Before you buy, understand the market in numbers.',re:'Aqar, Bayut SA, Wasalt, Rakez and Merbab all lead with data and verification.'},
+{en:'Explorer',ar:'المستكشف',d:'Freedom',da:'الحرية',t:'Pushes past the familiar to find something new.',ta:'يخرج عن المألوف ليكتشف الجديد.',s:'اطلع من المألوف… حي جديد وحياة جديدة',g:'Leave the familiar: a new district, a new life.',re:'Open territory. New districts and destinations could claim it.'},
+{en:'Outlaw',ar:'المتمرد',d:'Liberation',da:'التحرر',t:'Breaks the rules that no longer serve people.',ta:'يكسر القواعد التي لم تعد تخدم الناس.',s:'السوق له قواعد. إحنا كسرناها',g:'The market has rules. We broke them.',re:'Nobody. A regulated market makes this a hard seat to hold.'},
+{en:'Magician',ar:'الساحر',d:'Transformation',da:'التحوّل',t:'Makes the complicated feel effortless.',ta:'يحوّل المعقّد إلى سهل، كأنه سحر.',s:'بضغطة زر، بيتك صار قريب',g:'One tap, and your home is closer.',re:'Raghdan, with AI tools that turn a listing into a video.'},
+{en:'Hero',ar:'البطل',d:'Mastery',da:'الإتقان',t:'Proves its worth through courage and hard-won achievement.',ta:'يثبت نفسه بالشجاعة والإنجاز.',s:'أول بيت لك… نوصلك له',g:'Your first home: we will get you there.',re:'Open, but risky for a marketer who does not control financing.'},
+{en:'Lover',ar:'المحب',d:'Intimacy',da:'القرب',t:'Sells beauty, desire and the feeling of being special.',ta:'يبيع الجمال والرغبة والإحساس بالتميّز.',s:'مكان يشبه ذوقك ويليق فيك',g:'A place that matches your taste and suits you.',re:'The second voice of Dar Al Arkan’s designer-branded residences.'},
+{en:'Jester',ar:'المهرج',d:'Pleasure',da:'المتعة',t:'Brings joy and lives in the moment.',ta:'يصنع البهجة ويعيش اللحظة.',s:'حيّاكم في اللايف… الليلة فيها مفاجآت!',g:'Welcome to the live: surprises tonight!',re:'Influencer-broadcasters, and our own TikTok lives.'},
+{en:'Everyman',ar:'ابن البلد',d:'Belonging',da:'الانتماء',t:'Down to earth, one of us, for everyone.',ta:'بسيط وقريب، واحد منّا وللجميع.',s:'مثلك مثلنا، ندوّر على بيت يناسب الراتب',g:'We are like you, looking for a home that fits the salary.',re:'Where Tqres naturally speaks today.'},
+{en:'Caregiver',ar:'الراعي',d:'Service',da:'الخدمة',t:'Protects people and looks after them.',ta:'يحمي الناس ويهتم بهم.',s:'خلنا نحسبها معك قبل لا تقرر',g:'Let us work out the numbers with you before you decide.',re:'ROSHN and NHC / Sakani, both at national scale and from a distance.'},
+{en:'Ruler',ar:'الحاكم',d:'Control',da:'التحكّم',t:'Leads with authority, status and order.',ta:'يقود بالهيبة والمكانة والنظام.',s:'عنوان لا يسكنه إلا القلة',g:'An address only a few will ever live at.',re:'Dar Al Arkan, Shaml and Alef.'},
+{en:'Creator',ar:'المبدع',d:'Innovation',da:'الابتكار',t:'Builds things of lasting value.',ta:'يبني ما يبقى وله قيمة.',s:'نبني أحياء تبقى لأجيال',g:'We build neighbourhoods that last for generations.',re:'Retal, the self-described urban developer.'}
+];
+const Q=[['Seek meaning','البحث عن المعنى'],['Leave a mark','ترك الأثر'],['Connect with people','القرب من الناس'],['Give structure','بناء النظام']];
+const B={1:['Rakez','Bayut SA','Aqar','Wasalt','Merbab'],10:['Dar Al Arkan','Shaml','Alef'],9:['ROSHN','NHC / Sakani'],11:['Retal'],4:['Raghdan'],7:['Influencer-broadcasters']};
+const STAGES=[['brands','Brands','البراندات'],['the-12','The 12','الأنماط'],['market','The market','السوق'],['today','Tqres today','اليوم'],['next','Tqres next','بكرة'],['play','Play','العب']];
+const NS='http://www.w3.org/2000/svg',svg=document.getElementById('svg'),hub=document.getElementById('hub'),story=document.getElementById('story'),wheel=document.getElementById('wheel');
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let stage=0,cur=9,timer=null,touring=!reduce,game=null;
+const col=i=>`hsl(${(195+i*30)%360} 52% 64%)`;
+const pt=(r,a)=>[r*Math.cos(a*Math.PI/180),r*Math.sin(a*Math.PI/180)];
+function el(n,at,txt){const e=document.createElementNS(NS,n);for(const k in at)e.setAttribute(k,at[k]);if(txt)e.textContent=txt;return e}
+const segs=A.map((a,i)=>{
+  const a1=-90+i*30+.8,a2=a1+28.4,m=-75+i*30,R1=118,R2=252;
+  const [x1,y1]=pt(R2,a1),[x2,y2]=pt(R2,a2),[x3,y3]=pt(R1,a2),[x4,y4]=pt(R1,a1),[cx,cy]=pt(188,m),[dx,dy]=pt(12,m);
+  const g=el('g',{class:'seg',tabindex:0,role:'button','aria-label':a.en+' '+a.ar});
+  g.style.setProperty('--dx',dx+'px');g.style.setProperty('--dy',dy+'px');
+  g.append(el('path',{d:`M${x1} ${y1}A${R2} ${R2} 0 0 1 ${x2} ${y2}L${x3} ${y3}A${R1} ${R1} 0 0 0 ${x4} ${y4}Z`,fill:col(i)}),
+    el('text',{class:'en',x:cx,y:cy-4},a.en.toUpperCase()),el('text',{class:'ar',x:cx,y:cy+15},a.ar));
+  const pick=()=>{if(stage===1){touring=false;select(i)}else if(stage===0){touring=false;glob(i);sync()}};
+  g.addEventListener('click',pick);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}});
+  svg.append(g);
+  (B[i]||[]).forEach((n,k)=>{const [px,py]=pt(268+k*17,m);const c=el('circle',{class:'dot',cx:px,cy:py,r:6});c.style.transitionDelay=(k*120)+'ms';c.append(el('title',{},n));svg.append(c)});
+  return g;
+});
+const mk=el('g',{id:'mk'});mk.append(el('circle',{class:'ring',r:16}),el('circle',{r:8,fill:'#F0B94A'}),el('text',{y:-22},'تكريس'));svg.append(mk);
+function mark(a){const [x,y]=pt(292,a);mk.style.transform=`translate(${x}px,${y}px)`}
+mark(150);
+function light(on,half,sel){segs.forEach((g,i)=>{g.classList.toggle('dim',!on.includes(i)&&!(half||[]).includes(i));g.classList.toggle('half',(half||[]).includes(i));g.classList.toggle('sel',i===sel)})}
+const all=A.map((_,i)=>i);
+function chip(i){const a=A[i];return `<span class="chip" style="background:${col(i)}">${a.en}<i>${a.ar}</i></span>`}
+function select(i){
+  cur=i;const a=A[i],q=Q[Math.floor(i/3)];
+  light(all,null,i);
+  hub.innerHTML=`<small>Core drive</small><b>${q[0]}</b><i>${q[1]}</i>`;
+  story.innerHTML=`<p class="eyebrow">Stage 2 · The 12 archetypes · tap any segment</p>
+  <h1>${a.en}</h1><p class="arh">${a.ar}</p>
+  <span class="chip" style="background:${col(i)}">Wants: ${a.d}<i>${a.da}</i></span>
+  <p>${a.t}</p><p class="rtl">${a.ta}</p>
+  <div class="say"><p class="muted" style="font-size:14px">Sounds like</p><p class="rtl">«${a.s}»</p><p class="muted">${a.g}</p></div>
+  <p><b>In Saudi real estate:</b> ${a.re}</p>
+  <p class="muted" style="font-size:15px">Every brand is a character. A strong one plays one lead role and one supporting role, never all twelve.</p>`;
+  restart();sync();
+}
+function restart(){story.style.animation='none';void story.offsetWidth;story.style.animation=''}
+function tour(){clearInterval(timer);if(touring&&stage===1)timer=setInterval(()=>select((cur+1)%12),4200);else if(touring&&stage===0)timer=setInterval(()=>glob((gi+1)%12),2400)}
+function sync(){const p=document.getElementById('play');p.hidden=stage>1||reduce;p.textContent=touring?'Pause tour':'Play tour';tour()}
+const G=[['Dove','Simple, honest care'],['BBC','Informs and explains'],['The North Face','Gear for going further'],['Harley-Davidson','Freedom from the rules'],['Disney','Makes wonder feel real'],['Nike','Push past your limits'],['Godiva','Pure indulgence'],['Old Spice','Sells with humour'],['IKEA','Good design for everyone'],['UNICEF','Protects children'],['Hugo Boss','Status and control'],['Apple','Tools for people who make things']];
+let gi=5;
+function glob(i){gi=i;light(all,null,i);
+  hub.innerHTML=`<small>${A[i].en} · ${A[i].ar}</small><b style="font-size:clamp(15px,1.9vw,24px);color:var(--gold)">${G[i][0]}</b>`;
+  story.querySelectorAll('.ex').forEach(e=>e.classList.toggle('on',+e.dataset.i===i))}
+function intro(){
+  const order=[11,0,1,2,3,4,5,6,7,8,9,10];
+  story.innerHTML=`<p class="eyebrow">Stage 1 · Start here</p>
+  <h1>A brand is a character, not a logo</h1><p class="arh">البراند شخصية… مو شعار</p>
+  <p>People forget features. They remember how a brand makes them feel, the same way they remember a person. Archetypes are 12 characters every culture already knows: the hero, the carer, the joker, the wise one. A brand that plays one of them consistently is recognised in a second.</p>
+  <p class="rtl">الناس تنسى المواصفات وتتذكر إحساسها تجاه البراند، مثل إحساسها تجاه شخص تعرفه. الأنماط ١٢ شخصية يعرفها كل الناس: البطل، الراعي، خفيف الدم، الحكيم. والبراند اللي يلعب دور واحد بثبات، تعرفه من أول ثانية.</p>
+  <div class="exs">${order.map(i=>`<button class="ex" data-i="${i}" style="--c:${col(i)}"><b>${G[i][0]}</b><span>${A[i].en} · ${A[i].ar}</span><em>${G[i][1]}</em></button>`).join('')}</div>
+  <p class="muted" style="font-size:15px">Closer to home, as a first read: AlBaik feels like an Everyman, Almarai like a Caregiver. Next, the 12 in detail, then our own market.</p>`;
+  story.querySelectorAll('.ex').forEach(e=>e.onclick=()=>{touring=false;glob(+e.dataset.i);sync()});
+  glob(gi);restart();
+}
+function market(){
+  light(Object.keys(B).map(Number),null,-1);
+  hub.innerHTML=`<small>Market read</small><b>13 brands</b><i>٦ مقاعد فقط</i>`;
+  const rows=[1,10,9,11,4,7].map(i=>`<div>${chip(i)}</div><div class="tags">${B[i].map(n=>`<span>${n}</span>`).join('')}</div>`).join('');
+  story.innerHTML=`<p class="eyebrow">Stage 3 · The Saudi market</p>
+  <h1>Thirteen brands crowd into six seats</h1><p class="arh">الكل يتكلم بلغة الثقة والأرقام</p>
+  <p>Each dot on the wheel is a brand. Marketing firms and platforms pile into <b>Sage</b> and <b>Ruler</b>: data, licences, verification, “trust”. Rakez sells professional, transparent marketing. Bayut SA sells verified listings and market guides. <b>Caregiver</b> belongs to two national giants. Half the wheel is empty.</p>
+  <div class="grp">${rows}</div>
+  <div class="say"><p><b>The gap:</b> no marketing company is both close to the buyer and caring. Individual influencers are close, but they are people, not companies.</p></div>
+  <p class="muted" style="font-size:15px">This is a facilitator’s read of each brand’s lead archetype. Challenge it with evidence in the room.</p>`;
+}
+function today(){
+  light([7,8],null,-1);mark(150);
+  hub.innerHTML=`<small>Today</small><span class="word">تكريس</span><b>Everyman + Jester</b>`;
+  story.innerHTML=`<p class="eyebrow">Stage 4 · Tqres today</p>
+  <h1>One of us, and fun to watch</h1><p class="arh">ابن البلد + المهرج</p>
+  <div class="pair">
+   <div class="box">${chip(8)}<ul><li>Arabic only, plain Najdi voice</li><li>Free <span class="rtl">الحسبة العقارية</span> for SAR 4–5k salaries</li><li>The customer-journey ad</li></ul></div>
+   <div class="box">${chip(7)}<ul><li>5 TikTok lives a week</li><li>Influencers such as <span class="rtl">أبو سهم</span></li><li>Baloot campaign in Q1 2027</li></ul></div>
+  </div>
+  <p>This mix is why leads are growing. It is also the risk.</p>
+  <div class="say"><p><b>The risk:</b> people enjoy a Jester, but they do not hand a SAR 500k decision to entertainment. If the show is bigger than the promise, the influencer owns the audience and Tqres pays for every lead again.</p></div>
+  <p class="rtl muted">الناس تتابع اللايف… لكن تشتري ممّن تثق أنه واقف معها.</p>`;
+}
+function next(){
+  light([8,9],[7],-1);mark(180);
+  hub.innerHTML=`<small>Next</small><span class="word">تكريس</span><b>Caregiver + Everyman</b>`;
+  story.innerHTML=`<p class="eyebrow">Stage 5 · Tqres next · recommendation</p>
+  <h1>The devoted ally</h1><p class="arh">الراعي + ابن البلد</p>
+  <p>Watch the marker move one seat up the wheel. <span class="rtl">تكريس</span> means devotion, so the name already makes a Caregiver promise. We keep it for developers and have never made it to buyers.</p>
+  <div class="pair">
+   <div class="box"><h3>To developers</h3><p class="rtl" style="font-size:20px;font-weight:700">نتكرّس لمشروعك</p><p class="muted">Devoted to your project. Already true.</p></div>
+   <div class="box hot"><h3>To buyers</h3><p class="rtl" style="font-size:20px;font-weight:700;color:var(--gold)">نتكرّس لقرارك</p><p class="muted">Devoted to your decision. Missing today.</p></div>
+  </div>
+  <div class="say"><p class="rtl">«مكرّسين لك لين تستلم مفتاحك»</p><p class="muted">Devoted to you until you hold your key. A working line for the creative team to beat.</p></div>
+  <p><b>The Jester stays, as the door.</b> Lives, Baloot and influencers bring people in. Each one ends with an act of care: the calculation, a named advisor, a site visit.</p>`;
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function play(){
+  if(!game||game.i>=game.order.length)game={order:shuffle(all).slice(0,6),i:0,score:0};
+  round();
+}
+function round(){
+  const g=game;light(all,null,-1);
+  hub.innerHTML=`<small>Score</small><span class="word">${g.score}/${g.order.length}</span>`;
+  if(g.i>=g.order.length){
+    story.innerHTML=`<p class="eyebrow">Stage 6 · Results</p><h1>${g.score} out of ${g.order.length}</h1><p class="arh">${g.score>=5?'أذن موسيقية للعلامات':'جولة ثانية؟'}</p>
+    <p>Now do it with real work: take the last 20 Tqres posts and tag each one with the archetype it sounds like. The posts that sound like no archetype go first.</p>
+    <div><button class="chip" id="again" style="background:var(--gold);border:none">Play again</button></div>`;
+    document.getElementById('again').onclick=()=>{game=null;play()};restart();return;
+  }
+  const ans=g.order[g.i],opts=shuffle([ans,...shuffle(all.filter(x=>x!==ans)).slice(0,3)]);
+  story.innerHTML=`<p class="eyebrow">Stage 6 · Guess the archetype · ${g.i+1} of ${g.order.length}</p>
+  <h1>Which archetype is speaking?</h1>
+  <div class="say"><p class="rtl" style="font-size:26px">«${A[ans].s}»</p><p class="muted">${A[ans].g}</p></div>
+  <div class="opts">${opts.map(o=>`<button data-o="${o}"><b>${A[o].en}</b><i>${A[o].ar}</i></button>`).join('')}</div>
+  <p id="fb" class="muted">Pick one. The wheel will show the answer.</p>`;
+  story.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{
+    const o=+b.dataset.o,ok=o===ans;if(ok)g.score++;
+    story.querySelectorAll('.opts button').forEach(x=>{x.disabled=true;if(+x.dataset.o===ans)x.classList.add('ok')});
+    if(!ok)b.classList.add('no');
+    light([ans],null,ans);
+    hub.innerHTML=`<small>Score</small><span class="word">${g.score}/${g.order.length}</span>`;
+    const fb=document.getElementById('fb');fb.className='';
+    fb.innerHTML=`<b>${ok?'Correct.':'It was '+A[ans].en+'.'}</b> ${A[ans].en} wants ${A[ans].d.toLowerCase()}: ${A[ans].t} <button class="chip" id="nx" style="background:var(--gold);border:none;margin-inline-start:8px">${g.i+1<g.order.length?'Next line':'See score'}</button>`;
+    document.getElementById('nx').onclick=()=>{g.i++;round()};
+  });
+  restart();
+}
+const nav=document.getElementById('nav');
+STAGES.forEach((s,i)=>{const b=document.createElement('button');b.innerHTML=`<b>${i+1} ${s[1]}</b><i>${s[2]}</i>`;b.onclick=()=>go(i);nav.append(b)});
+function go(i,fromHash){
+  stage=Math.max(0,Math.min(STAGES.length-1,i));
+  wheel.className='wheel s'+stage;
+  [...nav.children].forEach((b,k)=>b.setAttribute('aria-current',k===stage));
+  document.getElementById('prev').disabled=stage===0;
+  const n=document.getElementById('next');n.disabled=stage===STAGES.length-1;
+  n.textContent=stage<STAGES.length-1?STAGES[stage+1][1]+' →':'Done';
+  [intro,()=>select(cur),market,today,next,play][stage]();
+  if(stage)restart();sync();
+  if(!fromHash){try{history.replaceState(null,'','#'+STAGES[stage][0])}catch(e){}}
+}
+document.getElementById('prev').onclick=()=>go(stage-1);
+document.getElementById('next').onclick=()=>go(stage+1);
+document.getElementById('play').onclick=()=>{touring=!touring;sync()};
+addEventListener('keydown',e=>{if(e.target.closest('.seg,.opts'))return;if(e.key==='ArrowRight')go(stage+1);if(e.key==='ArrowLeft')go(stage-1)});
+function fromHash(){const k=STAGES.findIndex(s=>'#'+s[0]===location.hash);go(k<0?0:k,true)}
+addEventListener('hashchange',fromHash);
+fromHash();
+</script>
+</body>
+</html>
